@@ -1,0 +1,316 @@
+:root {
+    --bg-dark: #0a0a0e;
+    --panel-bg: rgba(255, 255, 255, 0.03);
+    --panel-border: rgba(255, 255, 255, 0.08);
+    --text-main: #ffffff;
+    --text-dim: #8b8b9e;
+    --accent-cyan: #00f3ff;
+    --accent-magenta: #ff003c;
+    --accent-green: #00ff66;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.background-effects {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.glow-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.4;
+    animation: float 10s infinite ease-in-out alternate;
+}
+
+.orb-1 {
+    width: 400px;
+    height: 400px;
+    background: var(--accent-cyan);
+    top: -100px;
+    left: -100px;
+}
+
+.orb-2 {
+    width: 500px;
+    height: 500px;
+    background: var(--accent-magenta);
+    bottom: -150px;
+    right: -100px;
+    animation-delay: -5s;
+}
+
+@keyframes float {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+.dashboard {
+    width: 90%;
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    z-index: 1;
+}
+
+.glass-panel {
+    background: var(--panel-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--panel-border);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.glass-panel:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 12px;
+}
+
+.header h1 {
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: 4px;
+    background: linear-gradient(90deg, #fff, var(--text-dim));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--accent-magenta);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--accent-magenta);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.status.connected .dot {
+    background-color: var(--accent-green);
+    box-shadow: 0 0 10px var(--accent-green);
+}
+
+.main-metrics {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+}
+
+.speed-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.speed-container .value {
+    font-size: 8rem;
+    font-weight: 900;
+    line-height: 1;
+    text-shadow: 0 0 40px rgba(255, 255, 255, 0.2);
+    font-variant-numeric: tabular-nums;
+}
+
+.speed-container .label {
+    font-size: 1.5rem;
+    color: var(--accent-cyan);
+    letter-spacing: 4px;
+    font-weight: 700;
+    margin-top: -10px;
+}
+
+.gear-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(255,0,60,0.1), rgba(255,0,60,0.0));
+    border: 1px solid rgba(255,0,60,0.2);
+}
+
+.gear-container .label {
+    font-size: 1.2rem;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+}
+
+.gear-container .value {
+    font-size: 6rem;
+    font-weight: 900;
+    color: var(--accent-magenta);
+    text-shadow: 0 0 30px rgba(255,0,60,0.4);
+}
+
+.rpm-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.rpm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.rpm-header .label {
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+}
+
+.rpm-header .value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+}
+
+.rpm-bar-container {
+    width: 100%;
+    height: 30px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rpm-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
+    border-radius: 15px;
+    transition: width 0.05s linear, background 0.2s;
+    box-shadow: 0 0 20px rgba(255,0,60,0.5);
+}
+
+.pedals-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+}
+
+.pedal-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.pedal-label {
+    font-size: 1rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+}
+
+.pedal-track {
+    width: 40px;
+    height: 150px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.pedal-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0%;
+    border-radius: 20px;
+    transition: height 0.05s linear;
+}
+
+.throttle-fill {
+    background: linear-gradient(0deg, #00ff66, #00cc52);
+    box-shadow: 0 0 15px rgba(0, 255, 102, 0.5);
+}
+
+.brake-fill {
+    background: linear-gradient(0deg, #ff003c, #cc0030);
+    box-shadow: 0 0 15px rgba(255, 0, 60, 0.5);
+}
+
+.pedal-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.steer-track {
+    width: 100%;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    margin: 55px 0;
+}
+
+.steer-center {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(-50%);
+}
+
+.steer-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 30px;
+    background: var(--accent-cyan);
+    border-radius: 10px;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 15px var(--accent-cyan);
+    transition: left 0.05s linear;
+}

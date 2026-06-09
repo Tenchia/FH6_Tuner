@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forza Horizon Telemetry</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-effects">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <div class="dashboard">
+        <div class="header">
+            <h1>FH6 TELEMETRY</h1>
+            <div class="status">
+                <span class="dot"></span>
+                <span id="connection-status">Connecting...</span>
+            </div>
+        </div>
+
+        <div class="main-metrics">
+            <div class="speed-container glass-panel">
+                <div class="value" id="speed-val">0</div>
+                <div class="label">KM/H</div>
+            </div>
+
+            <div class="gear-container glass-panel">
+                <div class="label">GEAR</div>
+                <div class="value" id="gear-val">N</div>
+            </div>
+        </div>
+
+        <div class="rpm-section glass-panel">
+            <div class="rpm-header">
+                <div class="label">RPM</div>
+                <div class="value" id="rpm-val">0</div>
+            </div>
+            <div class="rpm-bar-container">
+                <div class="rpm-bar-fill" id="rpm-bar"></div>
+            </div>
+        </div>
+
+        <div class="pedals-section">
+            <div class="pedal-container glass-panel">
+                <div class="pedal-label">THROTTLE</div>
+                <div class="pedal-track">
+                    <div class="pedal-fill throttle-fill" id="throttle-bar"></div>
+                </div>
+                <div class="pedal-value" id="throttle-val">0%</div>
+            </div>
+
+            <div class="pedal-container glass-panel">
+                <div class="pedal-label">BRAKE</div>
+                <div class="pedal-track">
+                    <div class="pedal-fill brake-fill" id="brake-bar"></div>
+                </div>
+                <div class="pedal-value" id="brake-val">0%</div>
+            </div>
+
+            <div class="pedal-container glass-panel">
+                <div class="pedal-label">STEER</div>
+                <div class="steer-track">
+                    <div class="steer-center"></div>
+                    <div class="steer-indicator" id="steer-indicator"></div>
+                </div>
+                <div class="pedal-value" id="steer-val">0%</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
