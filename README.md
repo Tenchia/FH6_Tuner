@@ -1,57 +1,68 @@
-# FH6 Tuner — Forza Horizon 6 Telemetry Dashboard
+# FH6 Tuner — Professional Telemetry Dashboard
 
-Real-time telemetry dashboard for Forza Horizon 6 that displays vehicle data (speed, RPM, gear, pedals, steering) in a browser via WebSocket.
+A real-time, browser-based telemetry dashboard and tuning advisor for **Forza Horizon 6**. It captures UDP telemetry directly from the game and provides live data visualization, smart tuning recommendations, and a garage management system.
 
-## Requirements
+## 🌟 Key Features
 
-- Python 3.10+
-- Forza Horizon 6 with Data Out enabled
+1. **Live Dashboard**: High-performance layout displaying speed, gear, RPM, horizontal pedal inputs, tire temps, suspension travel, G-forces, and car balance in real-time.
+2. **Garage & Setup**: 
+   - A clean UI to input car base specifications (weight, springs, aero).
+   - Generates and calculates base tunes instantly.
+   - Saves your car setups persistently in your `data/` folder.
+3. **Telemetry & Advisor**: 
+   - Record and analyze driving sessions.
+   - Detects bottoming out, understeer/oversteer, bad shift points, and excessive wheel spin.
+   - Automatically suggests precise tuning adjustments (e.g. "Stiffen Rear Springs by 10%").
 
-## Quick Start
+## 📁 Project Structure
 
-```bash
-# 1. Create virtual environment
-python -m venv venv
+- `server.py`: The main Python backend (UDP listener & WebSocket server).
+- `public/`: The frontend UI (HTML, CSS, JS) with a premium glassmorphism design.
+- `data/`: Local storage for `cars.json` (car DB) and `garage.json` (your saved setups).
+- `dev_scripts/`: Utility scripts for reverse-engineering and fetching car data.
+- `logs/`: Recorded telemetry sessions.
 
-# 2. Activate it
-# Windows PowerShell:
-.\venv\Scripts\Activate.ps1
-# Windows CMD:
-.\venv\Scripts\activate.bat
+## 🚀 Quick Start
 
-# 3. Install dependencies
-pip install -r requirements.txt
+1. **Install Python 3.10+**.
+2. **Create and activate a virtual environment**:
+   ```bash
+   python -m venv venv
+   # Windows PowerShell:
+   .\venv\Scripts\Activate.ps1
+   ```
+3. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. **Run the server**:
+   ```bash
+   python server.py
+   ```
+5. **Open** `http://127.0.0.1:8000` in your web browser.
 
-# 4. Run the server
-python server.py
-```
+## 🎮 FH6 In-Game Settings
 
-Open **http://127.0.0.1:8000** in your browser.
+Go to **Settings → HUD and Gameplay → Data Out** and set:
+- **Data Out**: ON
+- **Data Out IP Address**: 127.0.0.1
+- **Data Out IP Port**: 20177
 
-## FH6 Settings
+*(Note: Avoid ports 5200–5300 as FH6 reserves them internally)*
 
-In-game: **Settings → HUD and Gameplay → Data Out**
+## ⚠️ Microsoft Store / Xbox App Version
 
-| Setting | Value |
-|---------|-------|
-| Data Out | **ON** |
-| Data Out IP Address | **127.0.0.1** |
-| Data Out IP Port | **20127** |
-
-> ⚠️ Avoid ports 5200–5300 — FH6 reserves them internally.
-
-## MS Store / Xbox App Version
-
-If you installed FH6 from the Microsoft Store or Xbox App, you need to enable loopback access. Run the included script **as Administrator**:
+If you installed FH6 from the MS Store or Xbox App, UWP security blocks local loopback connections. 
+You **must** run the included script as Administrator to allow FH6 to send data to your local server:
 
 ```powershell
 .\fix_loopback.ps1
 ```
+*(This step is NOT needed if you play on Steam).*
 
-This is **not needed** for the Steam version.
+## 🛠️ Troubleshooting
 
-## Troubleshooting
-
-- **No data?** Make sure you're actively driving (not in menu/paused).
-- **Check the console** — the server prints diagnostic messages every 10 seconds if no packets arrive.
-- **Firewall** — allow UDP traffic on port 20127.
+- **No data in the browser?** 
+  - Ensure you are actually driving (telemetry pauses in menus).
+  - Check the server console for warnings.
+  - Verify your Windows Firewall isn't blocking UDP port 20177.

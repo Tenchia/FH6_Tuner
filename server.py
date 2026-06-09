@@ -21,7 +21,9 @@ UDP_PORT = 20177
 
 # Directories and files
 LOGS_DIR = os.path.join(os.path.dirname(__file__), "logs")
-GARAGE_FILE = os.path.join(os.path.dirname(__file__), "garage.json")
+DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
+os.makedirs(DATA_DIR, exist_ok=True)
+GARAGE_FILE = os.path.join(DATA_DIR, "garage.json")
 if not os.path.exists(LOGS_DIR):
     os.makedirs(LOGS_DIR)
 if not os.path.exists(GARAGE_FILE):
@@ -52,10 +54,12 @@ async def save_log(request: Request):
         
         # Load cars.json dictionary
         cars_db = {}
-        cars_json_path = os.path.join(os.path.dirname(__file__), "cars.json")
-        if os.path.exists(cars_json_path):
-            with open(cars_json_path, "r", encoding="utf-8") as f:
+        cars_json_path = os.path.join(DATA_DIR, "cars.json")
+        try:
+            with open(cars_json_path, 'r', encoding='utf-8') as f:
                 cars_db = json.load(f)
+        except:
+            pass
 
         # Extract info from first frame
         if isinstance(data, dict) and "log" in data:
