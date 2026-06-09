@@ -3,6 +3,7 @@ import struct
 import socket
 import threading
 import time
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
@@ -10,11 +11,18 @@ import uvicorn
 
 # === CONFIGURATION ===
 # Set this to the SAME port you configured in FH6:
-# Settings → HUD and Gameplay → Data Out IP Port
+# Settings > HUD and Gameplay > Data Out IP Port
 UDP_PORT = 20127
-# Avoid ports 5200-5300 — FH6 reserves them internally
+# Avoid ports 5200-5300 -- FH6 reserves them internally
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app):
+    thread = threading.Thread(target=udp_listener, daemon=True)
+    thread.start()
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 app.mount("/static", StaticFiles(directory="public"), name="static")
 
@@ -37,11 +45,11 @@ def udp_listener():
     global latest_telemetry
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind(('0.0.0.0', UDP_PORT))
-    print(f"✅ Listening for FH6 Telemetry on UDP port {UDP_PORT}", flush=True)
-    print(f"   Make sure FH6 Data Out IP Port is set to: {UDP_PORT}", flush=True)
-    print(f"   Make sure FH6 Data Out IP Address is: 127.0.0.1", flush=True)
-    print(f"   Make sure Data Out is: ON", flush=True)
-    print(f"   ⏳ Waiting for packets...", flush=True)
+    print(f"[OK] Listening for FH6 Telemetry on UDP port {UDP_PORT}", flush=True)
+    print(f"     Make sure FH6 Data Out IP Port is set to: {UDP_PORT}", flush=True)
+    print(f"     Make sure FH6 Data Out IP Address is: 127.0.0.1", flush=True)
+    print(f"     Make sure Data Out is: ON", flush=True)
+    print(f"     Waiting for packets...", flush=True)
     
     packets = 0
     start_time = time.time()
@@ -56,12 +64,12 @@ def udp_listener():
             packets += 1
             
             if packets == 1:
-                print(f"🎉 First packet received from {addr}! Size: {len(data)} bytes", flush=True)
+                print(f"[RECV] First packet received from {addr}! Size: {len(data)} bytes", flush=True)
             
             # FH6 sends 324-byte packets
             if len(data) < 324:
                 if packets <= 3:
-                    print(f"⚠️  Unexpected packet size: {len(data)} bytes (expected 324)", flush=True)
+                    print(f"[WARN] Unexpected packet size: {len(data)} bytes (expected 324)", flush=True)
                 continue
             
             # Check IsRaceOn (offset 0, S32) — 0 means in menu/paused
@@ -97,23 +105,18 @@ def udp_listener():
             }
             
             if packets % 120 == 0:
-                print(f"📊 [{packets} pkts] RPM:{latest_telemetry['rpm']} Speed:{latest_telemetry['speed']}km/h Gear:{gear}", flush=True)
+                print(f"[DATA] [{packets} pkts] RPM:{latest_telemetry['rpm']} Speed:{latest_telemetry['speed']}km/h Gear:{gear}", flush=True)
                 
         except socket.timeout:
             # No packets received for 10 seconds — print diagnostic
             elapsed = int(time.time() - start_time)
-            print(f"⚠️  No packets received ({elapsed}s elapsed, {packets} total). Check:", flush=True)
-            print(f"   1. FH6 Data Out = ON, Port = {UDP_PORT}, IP = 127.0.0.1", flush=True)
-            print(f"   2. You are driving (not in menu/paused)", flush=True)
-            print(f"   3. Firewall allows UDP on port {UDP_PORT}", flush=True)
-            print(f"   4. If MS Store/Xbox version: run fix_loopback.ps1 as Admin", flush=True)
+            print(f"[WARN] No packets received ({elapsed}s elapsed, {packets} total). Check:", flush=True)
+            print(f"       1. FH6 Data Out = ON, Port = {UDP_PORT}, IP = 127.0.0.1", flush=True)
+            print(f"       2. You are driving (not in menu/paused)", flush=True)
+            print(f"       3. Firewall allows UDP on port {UDP_PORT}", flush=True)
+            print(f"       4. If MS Store/Xbox version: run fix_loopback.ps1 as Admin", flush=True)
         except Exception as e:
-            print(f"❌ Error parsing packet: {e}", flush=True)
-
-@app.on_event("startup")
-async def startup_event():
-    thread = threading.Thread(target=udp_listener, daemon=True)
-    thread.start()
+            print(f"[ERR] Error parsing packet: {e}", flush=True)
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
