@@ -2,76 +2,457 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forza Horizon Telemetry</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>FH6 Tuning Calculator</title>
+    <meta name="description" content="Professional Forza Horizon 6 telemetry tuner with live dashboard, gearing calculator, and suspension advisor.">
+    <link rel="stylesheet" href="style.css?v=5">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="background-effects">
         <div class="glow-orb orb-1"></div>
         <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
     </div>
 
-    <div class="dashboard">
-        <div class="header">
-            <h1>FH6 TELEMETRY</h1>
-            <div class="status">
+    <div class="app">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">FH6 <span>TUNER</span></div>
+            <div class="status" id="status">
                 <span class="dot"></span>
-                <span id="connection-status">Connecting...</span>
+                <span id="status-text">Connecting...</span>
             </div>
-        </div>
+        </header>
 
-        <div class="main-metrics">
-            <div class="speed-container glass-panel">
-                <div class="value" id="speed-val">0</div>
-                <div class="label">KM/H</div>
-            </div>
+        <!-- Tab Navigation -->
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="live">LIVE DASHBOARD</button>
+            <button class="tab-btn" data-tab="setup">GARAGE & SETUP</button>
+            <button class="tab-btn" data-tab="advisor">TELEMETRY & ADVISOR</button>
+        </nav>
 
-            <div class="gear-container glass-panel">
-                <div class="label">GEAR</div>
-                <div class="value" id="gear-val">N</div>
-            </div>
-        </div>
-
-        <div class="rpm-section glass-panel">
-            <div class="rpm-header">
-                <div class="label">RPM</div>
-                <div class="value" id="rpm-val">0</div>
-            </div>
-            <div class="rpm-bar-container">
-                <div class="rpm-bar-fill" id="rpm-bar"></div>
-            </div>
-        </div>
-
-        <div class="pedals-section">
-            <div class="pedal-container glass-panel">
-                <div class="pedal-label">THROTTLE</div>
-                <div class="pedal-track">
-                    <div class="pedal-fill throttle-fill" id="throttle-bar"></div>
+        <!-- ═══════════ Tab: LIVE DASHBOARD ═══════════ -->
+        <section class="tab-content active" id="tab-live">
+            <!-- Row 1: Speed + Gear -->
+            <div class="live-top">
+                <div class="speed-box glass-panel">
+                    <div class="speed-value" id="speed-val">0</div>
+                    <div class="speed-unit">KM/H</div>
                 </div>
-                <div class="pedal-value" id="throttle-val">0%</div>
+                <div class="gear-box glass-panel">
+                    <div class="gear-label">GEAR</div>
+                    <div class="gear-value" id="gear-val">N</div>
+                </div>
             </div>
 
-            <div class="pedal-container glass-panel">
-                <div class="pedal-label">BRAKE</div>
-                <div class="pedal-track">
-                    <div class="pedal-fill brake-fill" id="brake-bar"></div>
+            <!-- Row 2: RPM Bar -->
+            <div class="rpm-box glass-panel">
+                <div class="rpm-header">
+                    <span class="rpm-label">RPM</span>
+                    <span class="rpm-value" id="rpm-val">0</span>
                 </div>
-                <div class="pedal-value" id="brake-val">0%</div>
+                <div class="rpm-track"><div class="rpm-fill" id="rpm-bar"></div></div>
             </div>
 
-            <div class="pedal-container glass-panel">
-                <div class="pedal-label">STEER</div>
-                <div class="steer-track">
-                    <div class="steer-center"></div>
-                    <div class="steer-indicator" id="steer-indicator"></div>
+            <!-- Row 3: Horizontal Pedals -->
+            <div class="pedals-row glass-panel">
+                <div class="pedal">
+                    <div class="pedal-label">THROTTLE</div>
+                    <div class="pedal-track"><div class="pedal-fill throttle-color" id="throttle-bar"></div></div>
+                    <div class="pedal-val" id="throttle-val">0%</div>
                 </div>
-                <div class="pedal-value" id="steer-val">0%</div>
+                <div class="pedal">
+                    <div class="pedal-label">BRAKE</div>
+                    <div class="pedal-track"><div class="pedal-fill brake-color" id="brake-bar"></div></div>
+                    <div class="pedal-val" id="brake-val">0%</div>
+                </div>
+                <div class="pedal">
+                    <div class="pedal-label">STEER</div>
+                    <div class="steer-track">
+                        <div class="steer-center-line"></div>
+                        <div class="steer-dot" id="steer-dot"></div>
+                    </div>
+                    <div class="pedal-val" id="steer-val">0%</div>
+                </div>
             </div>
-        </div>
+
+            <!-- Row 4: Tires + Suspension + G-Meter -->
+            <div class="live-mid">
+                <div class="tire-temps glass-panel">
+                    <div class="section-title">TIRE TEMPS (<span>&deg;C</span>)</div>
+                    <div class="tire-grid">
+                        <div class="tire-cell" id="tire-fl">--</div>
+                        <div class="tire-cell" id="tire-fr">--</div>
+                        <div class="tire-cell" id="tire-rl">--</div>
+                        <div class="tire-cell" id="tire-rr">--</div>
+                    </div>
+                    <div class="tire-labels">
+                        <span>FL</span><span>FR</span>
+                        <span>RL</span><span>RR</span>
+                    </div>
+                </div>
+
+                <div class="suspension glass-panel">
+                    <div class="section-title">SUSPENSION</div>
+                    <div class="susp-grid">
+                        <div class="susp-col">
+                            <div class="susp-bar-track"><div class="susp-bar-fill" id="susp-fl"></div></div>
+                            <span>FL</span>
+                        </div>
+                        <div class="susp-col">
+                            <div class="susp-bar-track"><div class="susp-bar-fill" id="susp-fr"></div></div>
+                            <span>FR</span>
+                        </div>
+                        <div class="susp-col">
+                            <div class="susp-bar-track"><div class="susp-bar-fill" id="susp-rl"></div></div>
+                            <span>RL</span>
+                        </div>
+                        <div class="susp-col">
+                            <div class="susp-bar-track"><div class="susp-bar-fill" id="susp-rr"></div></div>
+                            <span>RR</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="g-meter glass-panel">
+                    <div class="section-title">G-FORCE</div>
+                    <div class="g-meter-container">
+                        <canvas id="g-canvas" width="140" height="140"></canvas>
+                        <div class="g-values">
+                            <span id="g-lat-val">0.00</span>
+                            <span id="g-lon-val">0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 5: Balance + Info -->
+            <div class="live-bottom-row">
+                <div class="balance-bar glass-panel">
+                    <div class="balance-header">
+                        <span class="balance-label-left">UNDERSTEER</span>
+                        <span class="section-title" style="margin-bottom:0">BALANCE</span>
+                        <span class="balance-label-right">OVERSTEER</span>
+                    </div>
+                    <div class="balance-track">
+                        <div class="balance-center"></div>
+                        <div class="balance-indicator" id="balance-dot"></div>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-card glass-panel">
+                        <div class="info-label">POWER</div>
+                        <div class="info-value"><span id="power-val">0</span> HP</div>
+                    </div>
+                    <div class="info-card glass-panel">
+                        <div class="info-label">TORQUE</div>
+                        <div class="info-value"><span id="torque-val">0</span> Nm</div>
+                    </div>
+                    <div class="info-card glass-panel">
+                        <div class="info-label">CLASS</div>
+                        <div class="info-value" id="class-val">--</div>
+                    </div>
+                    <div class="info-card glass-panel">
+                        <div class="info-label">DRIVE</div>
+                        <div class="info-value" id="drive-val">--</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ═══════════ Tab: GARAGE & SETUP ═══════════ -->
+        <section class="tab-content" id="tab-setup">
+            <div class="glass-panel" style="display: flex; flex-direction: column; gap: 14px;">
+
+                <!-- Section: Car Profile -->
+                <div class="garage-section">
+                    <div class="garage-section-title"><span class="emoji">🚗</span> CAR PROFILE</div>
+                    <div class="input-group">
+                        <label>Load Smart Garage Setup:</label>
+                        <select id="garage-profile-select" class="bg-input" style="width: 100%;">
+                            <option value="">Waiting for car telemetry...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Section: Weight & Balance -->
+                <div class="garage-section">
+                    <div class="garage-section-title"><span class="emoji">⚖️</span> WEIGHT & BALANCE</div>
+                    <div class="garage-form-row">
+                        <div class="input-group">
+                            <label>Weight (kg):</label>
+                            <input type="number" id="car-weight" class="bg-input" value="1500" step="10" style="width: 120px;">
+                        </div>
+                        <div class="input-group">
+                            <label>Front Weight %:</label>
+                            <input type="number" id="car-front-weight" class="bg-input" value="50" step="0.1" max="100" min="0" style="width: 120px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Gearing -->
+                <div class="garage-section">
+                    <div class="garage-section-title"><span class="emoji">⚙️</span> GEARING</div>
+                    <div class="garage-form-row">
+                        <div class="input-group">
+                            <label>Top Speed (km/h):</label>
+                            <input type="number" id="car-top-speed" class="bg-input" value="320" step="5" min="100" style="width: 110px;">
+                        </div>
+                        <div class="input-group">
+                            <label>Gears:</label>
+                            <input type="number" id="car-gears" class="bg-input" value="6" step="1" min="3" max="10" style="width: 80px;">
+                        </div>
+                        <div class="input-group">
+                            <label>Shift RPM:</label>
+                            <input type="number" id="car-target-rpm" class="bg-input" placeholder="Auto" step="100" min="3000" style="width: 110px;">
+                        </div>
+                        <div class="input-group">
+                            <label>Tire Radius (m):</label>
+                            <input type="number" id="car-tire-radius" class="bg-input" placeholder="Auto" step="0.01" min="0.25" max="0.50" style="width: 110px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Springs & Ride Height -->
+                <div class="garage-section">
+                    <div class="garage-section-title"><span class="emoji">🔧</span> SPRINGS & RIDE HEIGHT</div>
+                    <div style="font-size: 0.65rem; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 8px;">SPRINGS (kgf/mm)</div>
+                    <div class="garage-form-row">
+                        <div class="input-group">
+                            <label>Front:</label>
+                            <div style="display: flex; gap: 6px;">
+                                <input type="number" id="car-spring-f-min" class="bg-input" placeholder="Min" style="width: 75px;">
+                                <input type="number" id="car-spring-f-max" class="bg-input" placeholder="Max" style="width: 75px;">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Rear:</label>
+                            <div style="display: flex; gap: 6px;">
+                                <input type="number" id="car-spring-r-min" class="bg-input" placeholder="Min" style="width: 75px;">
+                                <input type="number" id="car-spring-r-max" class="bg-input" placeholder="Max" style="width: 75px;">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.65rem; color: var(--text-muted); letter-spacing: 1px; margin: 12px 0 8px;">RIDE HEIGHT (cm)</div>
+                    <div class="garage-form-row">
+                        <div class="input-group">
+                            <label>Front:</label>
+                            <div style="display: flex; gap: 6px;">
+                                <input type="number" id="car-ride-f-min" class="bg-input" placeholder="Min" style="width: 75px;">
+                                <input type="number" id="car-ride-f-max" class="bg-input" placeholder="Max" style="width: 75px;">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Rear:</label>
+                            <div style="display: flex; gap: 6px;">
+                                <input type="number" id="car-ride-r-min" class="bg-input" placeholder="Min" style="width: 75px;">
+                                <input type="number" id="car-ride-r-max" class="bg-input" placeholder="Max" style="width: 75px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Aero -->
+                <div class="garage-section">
+                    <div class="garage-section-title"><span class="emoji">🛩️</span> AERO DOWNFORCE (kgf)</div>
+                    <div class="garage-form-row">
+                        <div class="input-group">
+                            <label>Front:</label>
+                            <div style="display: flex; gap: 6px;">
+                                <input type="number" id="car-aero-f-min" class="bg-input" placeholder="Min" style="width: 65px;">
+                                <input type="number" id="car-aero-f-max" class="bg-input" placeholder="Max" style="width: 65px;">
+                                <input type="number" id="car-aero-f-cur" class="bg-input" placeholder="Set" style="width: 70px; border-color: rgba(0,229,255,0.3);">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Rear:</label>
+                            <div style="display: flex; gap: 6px;">
+                                <input type="number" id="car-aero-r-min" class="bg-input" placeholder="Min" style="width: 65px;">
+                                <input type="number" id="car-aero-r-max" class="bg-input" placeholder="Max" style="width: 65px;">
+                                <input type="number" id="car-aero-r-cur" class="bg-input" placeholder="Set" style="width: 70px; border-color: rgba(0,229,255,0.3);">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Save -->
+                <div class="garage-section" style="border-color: rgba(0,229,255,0.08);">
+                    <div class="garage-section-title"><span class="emoji">💾</span> SAVE SETUP</div>
+                    <div class="garage-form-row">
+                        <div class="input-group" style="flex: 1;">
+                            <label>Setup Name:</label>
+                            <input type="text" id="garage-profile-name" class="bg-input" placeholder="e.g. A800 Grip" style="width: 100%;">
+                        </div>
+                        <button id="btn-save-garage" class="btn-primary" style="height: 36px; padding: 0 14px;">💾 Save</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Base Tune Cards -->
+            <div class="glass-panel">
+                <div class="section-title">CALCULATED BASE TUNE</div>
+                <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 12px;">Apply these values in-game. They update automatically when inputs change.</p>
+                <div id="setup-sheet-cards" class="card-grid">
+                    <div class="no-data-msg">Waiting for inputs...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════ Tab: TELEMETRY & ADVISOR ═══════════ -->
+        <section class="tab-content" id="tab-advisor">
+            <!-- Compact toolbar -->
+            <div class="advisor-toolbar">
+                <div class="glass-panel">
+                    <div class="section-title">NEW SESSION</div>
+                    <div class="session-form">
+                        <div class="input-group">
+                            <label>Target:</label>
+                            <div style="display: flex; gap: 6px;">
+                                <select id="session-type" class="bg-input" style="min-width: 100px;">
+                                    <option value="time">Time (Min)</option>
+                                    <option value="distance">Distance (KM)</option>
+                                    <option value="laps">Laps</option>
+                                </select>
+                                <input type="number" id="session-val" class="bg-input" value="2" min="0.1" step="0.1" style="width: 70px;">
+                            </div>
+                        </div>
+                        <button id="btn-start-session" class="btn-primary">▶ RECORD</button>
+                    </div>
+                    <div class="session-progress-container" id="session-progress-container" style="display:none;">
+                        <div class="session-status">Recording: <span id="session-status-text">0 / 2</span></div>
+                        <div class="advisor-progress"><div class="advisor-progress-fill" id="advisor-progress"></div></div>
+                        <button id="btn-stop-session" class="btn-danger">STOP & ANALYZE</button>
+                    </div>
+                </div>
+
+                <div class="glass-panel">
+                    <div class="section-title">LOAD PREVIOUS SESSION</div>
+                    <div class="session-form">
+                        <div class="input-group" style="flex: 1;">
+                            <label>Session Log:</label>
+                            <select id="log-select" class="bg-input" style="width: 100%;">
+                                <option value="">Loading logs...</option>
+                            </select>
+                        </div>
+                        <button id="btn-load-log" class="btn-secondary">LOAD</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upgrades — compact inline -->
+            <details class="glass-panel" style="padding: 10px 16px;">
+                <summary style="cursor: pointer; font-size: 0.7rem; color: var(--cyan); text-transform: uppercase; font-weight: 600; letter-spacing: 2px; list-style: none;">
+                    ⚙ INSTALLED UPGRADES ▾
+                </summary>
+                <div class="upgrades-grid" style="margin-top: 10px;">
+                    <label class="upgrade-toggle"><input type="checkbox" id="upg-tires" checked> <span>Tire Pressure</span></label>
+                    <label class="upgrade-toggle"><input type="checkbox" id="upg-gears" checked> <span>Race Transmission</span></label>
+                    <label class="upgrade-toggle"><input type="checkbox" id="upg-susp" checked> <span>Race Suspension</span></label>
+                    <label class="upgrade-toggle"><input type="checkbox" id="upg-arbs" checked> <span>Race ARBs</span></label>
+                    <label class="upgrade-toggle"><input type="checkbox" id="upg-aero-f" checked> <span>Front Aero</span></label>
+                    <label class="upgrade-toggle"><input type="checkbox" id="upg-aero-r" checked> <span>Rear Aero</span></label>
+                    <label class="upgrade-toggle"><input type="checkbox" id="upg-brakes" checked> <span>Race Brakes</span></label>
+                    <label class="upgrade-toggle"><input type="checkbox" id="upg-diff" checked> <span>Race Differential</span></label>
+                </div>
+            </details>
+
+            <!-- Placeholder -->
+            <div id="advisor-placeholder" class="glass-panel" style="text-align: center; color: var(--text-dim); padding: 30px;">
+                <div style="font-size: 1.8rem; margin-bottom: 10px;">📊</div>
+                Load a session log or record a new one to see charts and recommendations.
+            </div>
+
+            <!-- Results -->
+            <div id="advisor-results" style="display:none;">
+                <div id="advisor-no-data" class="glass-panel" style="display:none; text-align: center; color: var(--text-dim); margin-bottom: 20px;">
+                    Your tune looks solid! No major issues detected based on installed upgrades.
+                </div>
+
+                <!-- SECTION: GEARING & POWER -->
+                <div class="advisor-section" id="sec-gearing" style="margin-bottom: 30px;">
+                    <div class="advisor-section-header"><span class="emoji">⚙️</span> GEARING & POWER</div>
+                    <div class="advisor-layout">
+                        <div class="advisor-charts">
+                            <div class="chart-panel glass-panel" style="margin: 0;">
+                                <div class="section-title">RPM vs SPEED BY GEAR</div>
+                                <canvas id="gear-chart" width="800" height="280"></canvas>
+                            </div>
+                            <div class="chart-panel glass-panel" style="margin: 0;">
+                                <div class="section-title">POWER CURVE</div>
+                                <canvas id="power-chart" width="800" height="220"></canvas>
+                            </div>
+                        </div>
+                        <div class="advisor-sidebar">
+                            <div class="gear-stats glass-panel" style="margin: 0;">
+                                <div class="section-title">SHIFT POINTS</div>
+                                <div class="shift-table" id="shift-table">
+                                    <div class="shift-header"><span>Gear</span><span>Max RPM</span><span>Speed</span><span>Power</span></div>
+                                    <div id="shift-rows"><div class="shift-row"><span>No data...</span></div></div>
+                                </div>
+                            </div>
+                            <div class="glass-panel" style="margin: 0; flex: 1; display: flex; flex-direction: column;">
+                                <div class="section-title">GEARING RECOMMENDATIONS</div>
+                                <div id="advisor-cards-gearing" class="scroll-fade" style="flex: 1; overflow-y: auto; max-height: 350px; padding-right: 4px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: TIRES & ALIGNMENT -->
+                <div class="advisor-section" id="sec-tires" style="margin-bottom: 30px;">
+                    <div class="advisor-section-header"><span class="emoji">🛞</span> TIRES & ALIGNMENT</div>
+                    <div class="advisor-layout">
+                        <div class="advisor-charts">
+                            <div class="chart-panel glass-panel" style="margin: 0;">
+                                <div class="section-title">TIRE TEMPERATURE HISTORY</div>
+                                <canvas id="tire-temp-chart" width="800" height="280"></canvas>
+                            </div>
+                            <div class="chart-panel glass-panel" style="margin: 0;">
+                                <div class="section-title">SLIP ANGLE — FRONT vs REAR</div>
+                                <canvas id="slip-angle-chart" width="800" height="220"></canvas>
+                            </div>
+                        </div>
+                        <div class="advisor-sidebar">
+                            <div class="chart-panel glass-panel" style="margin: 0; text-align: center;">
+                                <div class="section-title">TIRE GRIP CIRCLE</div>
+                                <div class="grip-circles">
+                                    <div class="grip-item"><canvas id="grip-fl" width="110" height="110"></canvas><span>FL</span></div>
+                                    <div class="grip-item"><canvas id="grip-fr" width="110" height="110"></canvas><span>FR</span></div>
+                                    <div class="grip-item"><canvas id="grip-rl" width="110" height="110"></canvas><span>RL</span></div>
+                                    <div class="grip-item"><canvas id="grip-rr" width="110" height="110"></canvas><span>RR</span></div>
+                                </div>
+                            </div>
+                            <div class="glass-panel" style="margin: 0; flex: 1; display: flex; flex-direction: column;">
+                                <div class="section-title">ALIGNMENT RECOMMENDATIONS</div>
+                                <div id="advisor-cards-tires" class="scroll-fade" style="flex: 1; overflow-y: auto; max-height: 350px; padding-right: 4px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: SUSPENSION & AERO -->
+                <div class="advisor-section" id="sec-susp" style="margin-bottom: 30px;">
+                    <div class="advisor-section-header"><span class="emoji">🛠️</span> SUSPENSION & AERODYNAMICS</div>
+                    <div class="glass-panel" style="margin: 0;">
+                        <div id="advisor-cards-susp" class="scroll-fade" style="overflow-y: auto; max-height: 260px;"></div>
+                    </div>
+                </div>
+
+                <!-- SECTION: BRAKES & DIFFERENTIAL -->
+                <div class="advisor-section" id="sec-brakes" style="margin-bottom: 30px;">
+                    <div class="advisor-section-header"><span class="emoji">🛑</span> BRAKES & DIFFERENTIAL</div>
+                    <div class="glass-panel" style="margin: 0;">
+                        <div id="advisor-cards-brakes" class="scroll-fade" style="overflow-y: auto; max-height: 260px;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <script src="app.js"></script>
+    <script src="app.js?v=3"></script>
 </body>
 </html>

@@ -1,0 +1,41 @@
+{
+  "427": [
+    {
+      "name": "Nonda A700 Power Stock",
+      "weight": 1243,
+      "front_pct": 50,
+      "top_speed": 320,
+      "gears": 8,
+      "target_rpm": 9000,
+      "spring_f_min": 50.7,
+      "spring_f_max": 253.6,
+      "spring_r_min": 50.7,
+      "spring_r_max": 253.6,
+      "ride_f_min": 14,
+      "ride_f_max": 17.2,
+      "ride_r_min": 16.4,
+      "ride_r_max": 19.5,
+      "aero_f_min": "",
+      "aero_f_max": "",
+      "aero_r_min": "",
+      "aero_r_max": ""
+    },
+    {
+      "name": "Test1",
+      "weight": 1400,
+      "front_pct": 50,
+      "spring_f_min": 50.7,
+      "spring_f_max": 253.6,
+      "spring_r_min": 50.7,
+      "spring_r_max": 253.6,
+      "ride_f_min": 14,
+      "ride_f_max": 17.2,
+      "ride_r_min": 16.4,
+      "ride_r_max": 19.5,
+      "aero_f_min": "",
+      "aero_f_max": "",
+      "aero_r_min": "",
+      "aero_r_max": ""
+    }
+  ]
+}
