@@ -17,12 +17,27 @@ function connect() {
     ws = new WebSocket(`ws://${window.location.host}/ws`);
 
     ws.onopen = () => {
-        statusText.textContent = 'Connected to FH6';
+        statusText.textContent = 'Waiting for FH6 data...';
         statusContainer.classList.add('connected');
+        statusContainer.classList.remove('receiving');
     };
 
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
+        
+        // Check if FH6 is actually sending telemetry
+        if (data.connected && (data.rpm > 0 || data.speed > 0)) {
+            statusText.textContent = 'Receiving FH6 Telemetry';
+            statusContainer.classList.add('receiving');
+        } else if (data.connected) {
+            statusText.textContent = 'FH6 connected (in menu/paused)';
+            statusContainer.classList.add('connected');
+            statusContainer.classList.remove('receiving');
+        } else {
+            statusText.textContent = 'Waiting for FH6 data...';
+            statusContainer.classList.remove('receiving');
+        }
+        
         updateDashboard(data);
     };
 

@@ -127,8 +127,19 @@ body {
 }
 
 .status.connected .dot {
-    background-color: var(--accent-green);
-    box-shadow: 0 0 10px var(--accent-green);
+    background-color: #ffaa00;
+    box-shadow: 0 0 10px #ffaa00;
+}
+
+.status.receiving .dot {
+    background-color: var(--accent-cyan);
+    box-shadow: 0 0 10px var(--accent-cyan);
+    animation: pulse-dot 1s infinite ease-in-out;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 10px var(--accent-cyan); }
+    50% { box-shadow: 0 0 25px var(--accent-cyan), 0 0 40px rgba(0, 243, 255, 0.3); }
 }
 
 .main-metrics {
