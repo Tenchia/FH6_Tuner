@@ -60,6 +60,74 @@ function onCarChanged(newOrd) {
     }
 }
 
+const setVal = (id, val) => { const el = $(id); if (el) el.value = val !== undefined ? val : ''; };
+const getVal = id => { const el = $(id); return el ? parseFloat(el.value) || '' : ''; };
+
+$('garage-profile-select')?.addEventListener('change', (e) => {
+    const idx = e.target.value;
+    if (idx === "" || !currentCarOrdinal || !garageData[currentCarOrdinal]) return;
+    const p = garageData[currentCarOrdinal][idx];
+    if (!p) return;
+    
+    $('garage-profile-name').value = p.name || '';
+    setVal('car-weight', p.weight);
+    setVal('car-front-weight', p.front_pct);
+    setVal('car-top-speed', p.top_speed);
+    setVal('car-gears', p.gears);
+    setVal('car-target-rpm', p.target_rpm);
+    setVal('car-tire-radius', p.tire_radius);
+    
+    setVal('car-spring-f-min', p.spring_f_min); setVal('car-spring-f-max', p.spring_f_max);
+    setVal('car-spring-r-min', p.spring_r_min); setVal('car-spring-r-max', p.spring_r_max);
+    setVal('car-ride-f-min', p.ride_f_min); setVal('car-ride-f-max', p.ride_f_max);
+    setVal('car-ride-r-min', p.ride_r_min); setVal('car-ride-r-max', p.ride_r_max);
+    setVal('car-aero-f-min', p.aero_f_min); setVal('car-aero-f-max', p.aero_f_max);
+    setVal('car-aero-r-min', p.aero_r_min); setVal('car-aero-r-max', p.aero_r_max);
+    setVal('car-aero-f-cur', p.aero_f_cur); setVal('car-aero-r-cur', p.aero_r_cur);
+    
+    generateSetupSheet();
+});
+
+$('btn-save-garage')?.addEventListener('click', async () => {
+    if (!currentCarOrdinal) { alert("Connect to telemetry first to identify the car."); return; }
+    const name = $('garage-profile-name')?.value;
+    if (!name) { alert("Please enter a setup name."); return; }
+    
+    const profile = {
+        name,
+        weight: getVal('car-weight'), front_pct: getVal('car-front-weight'),
+        top_speed: getVal('car-top-speed'), gears: getVal('car-gears'),
+        target_rpm: getVal('car-target-rpm'), tire_radius: getVal('car-tire-radius'),
+        spring_f_min: getVal('car-spring-f-min'), spring_f_max: getVal('car-spring-f-max'),
+        spring_r_min: getVal('car-spring-r-min'), spring_r_max: getVal('car-spring-r-max'),
+        ride_f_min: getVal('car-ride-f-min'), ride_f_max: getVal('car-ride-f-max'),
+        ride_r_min: getVal('car-ride-r-min'), ride_r_max: getVal('car-ride-r-max'),
+        aero_f_min: getVal('car-aero-f-min'), aero_f_max: getVal('car-aero-f-max'),
+        aero_r_min: getVal('car-aero-r-min'), aero_r_max: getVal('car-aero-r-max'),
+        aero_f_cur: getVal('car-aero-f-cur'), aero_r_cur: getVal('car-aero-r-cur')
+    };
+    
+    try {
+        const res = await fetch('/api/garage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ car_ordinal: currentCarOrdinal, profile })
+        });
+        if (res.ok) {
+            const btn = $('btn-save-garage');
+            btn.textContent = 'Saved!';
+            btn.style.background = 'var(--green)';
+            setTimeout(() => { btn.textContent = '💾 Save'; btn.style.background = ''; }, 2000);
+            
+            // Reload garage data
+            garageData = await (await fetch('/api/garage')).json();
+            onCarChanged(currentCarOrdinal);
+        } else {
+            alert("Failed to save setup");
+        }
+    } catch(e) { console.error(e); alert("Failed to save setup"); }
+});
+
 function connect() {
     ws = new WebSocket(`ws://${window.location.host}/ws`);
     ws.onopen = () => {
